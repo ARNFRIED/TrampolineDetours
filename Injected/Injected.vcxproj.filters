@@ -16,9 +16,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EndsceneHandler.hpp" />
-    <ClInclude Include="Detour.hpp">
-      <Filter>Memory</Filter>
-    </ClInclude>
     <ClInclude Include="Timer.hpp">
       <Filter>Util</Filter>
     </ClInclude>
@@ -44,10 +41,10 @@
     <ClInclude Include="Camera.hpp">
       <Filter>Wow</Filter>
     </ClInclude>
-    <ClInclude Include="TDetour.hpp">
+    <ClInclude Include="disasm.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
-    <ClInclude Include="disasm.hpp">
+    <ClInclude Include="Detour.hpp">
       <Filter>Memory</Filter>
     </ClInclude>
   </ItemGroup>

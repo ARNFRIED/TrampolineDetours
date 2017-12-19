@@ -1,60 +1,65 @@
 #pragma once
 #include <vector>
+#include "disasm.hpp"
+
+using byte = unsigned char;
 
 class Detour
 {
-public:	
-	Detour(int target_func, int hook_func)
-		: target{ (byte*)target_func }
-		, hook{ hook_func }
-	{
-		new_bytes.push_back(0x68);				// push (the address provided through hook)
-		new_bytes.resize(5);
-		*(int*)(new_bytes.data() + 1) = hook;	// dirty hack
-		new_bytes.push_back(0xc3);				// return
-
-		original_bytes.resize(6);
-		MemCpyProtect(original_bytes.data(), target, 6);
-		Apply();
-	}
-
-	~Detour() 
+public:
+	Detour(int target_func, int hook): target{ (PVOID)target_func }, size{}
 	{		
-		Restore();		
+		auto next_instr = target;
+
+		while (size < 6)
+		{
+			next_instr = DetourCopyInstruction(&trampoline[size], next_instr);			
+			size = (int)next_instr - (int)target;
+		}
+
+		trampoline[size] = 0x68;								// push ...
+		*(int*)&trampoline[size + 1] = (int)target + size;		// the address of the next valid instruction in the target
+		trampoline[size + 5] = 0xc3;							// return
+
+		DWORD old_protection;
+		VirtualProtect(target, size, PAGE_EXECUTE_READWRITE, &old_protection);
+
+		*(byte*)target = 0x68;									// push ...
+		*(int*)((int)target + 1) = hook;						// the address of the detour
+		*(byte*)((int)target + 5) = 0xc3;						// return
+		for (auto i = 6; i < size; i++)
+		{
+			*(byte*)((int)target + i) = 0x90;					//fill the gap with NOPs
+		}
+
+		VirtualProtect(target, size, old_protection, 0);	
 	}
 
-	void Apply()
-	{	
-		MemCpyProtect(target, new_bytes.data(), 6);
-	}
-
-	void Restore()
+	~Detour()
 	{
-		MemCpyProtect(target, original_bytes.data(), 6);
+		Remove();
+	}
+	
+	void Remove()
+	{
+		DWORD old_protection;
+		VirtualProtect(target, size, PAGE_EXECUTE_READWRITE, &old_protection);
+		
+		for (auto i = 0; i < size; i++)
+		{
+			*(byte*)((int)target + i) = trampoline[i];
+		}
+
+		VirtualProtect(target, size, old_protection, 0);
 	}
 
 	template<typename T, typename... Args >
 	decltype(auto) Call(Args... args)
 	{
-		Restore();
-		VirtualProtect(target, 6, PAGE_EXECUTE_READWRITE, &old_protection);
-		auto ret = ((T*)target)(args...);
-		VirtualProtect(target, 6, old_protection, 0);
-		Apply();
-		return ret;
+		return ((T*)&trampoline)(args...);
 	}
-
-	void MemCpyProtect(byte* dest, byte* source, int lenght)
-	{		
-		VirtualProtect(dest, lenght, PAGE_EXECUTE_READWRITE, &old_protection);
-		memcpy(dest, source, lenght);
-		VirtualProtect(dest, lenght, old_protection, 0);
-	}
-
-	std::vector<byte> original_bytes{};
-	std::vector<byte> new_bytes{};
-	byte* target{};
-private:
-	int hook{};
-	DWORD old_protection;
+	
+	PVOID target{};
+	byte trampoline[32];
+	int size;
 };

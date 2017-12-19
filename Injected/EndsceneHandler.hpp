@@ -1,7 +1,7 @@
 #pragma once
 #include <map>
 #include <string>
-#include "TDetour.hpp"
+#include "Detour.hpp"
 #include "Timer.hpp"
 #include "WowFuncs.hpp"
 
@@ -9,7 +9,7 @@ volatile bool shouldRemoveEndSceneInjection{};
 volatile bool endSceneUnhooked{};
 volatile bool should_exit{};
 volatile int frameCount{};
-std::map<std::string, TDetour*> detours{};
+std::map<std::string, Detour*> detours{};
 
 //---------------- END SCENE DETOUR ------------------
 int __fastcall EndSceneDetour(int s_device, int edx)	//is a __thiscall

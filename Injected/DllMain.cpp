@@ -17,8 +17,8 @@ void MainThread(LPVOID lpParm)
 {
 	CreateConsole();
 
-	detours["CGxDeviceD3d__ISceneEnd"] = new TDetour(0x005A17A0, (int)EndSceneDetour);
-	detours["NetClientProcess"] = new TDetour(0x00537AA0, (int)NetClientProcessDetour);
+	detours["CGxDeviceD3d__ISceneEnd"] = new Detour(0x005A17A0, (int)EndSceneDetour);
+	detours["NetClientProcess"] = new Detour(0x00537AA0, (int)NetClientProcessDetour);
 
 	//-----------------------------------  loop here before exit ----------------------------------
 	//wait for the numpad 7 to be pressed...

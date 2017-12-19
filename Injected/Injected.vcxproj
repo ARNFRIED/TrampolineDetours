@@ -25,13 +25,12 @@
     <ClInclude Include="Camera.hpp" />
     <ClInclude Include="CDataStore.hpp" />
     <ClInclude Include="CommonDetours.hpp" />
-    <ClInclude Include="Detour.hpp" />
     <ClInclude Include="disasm.hpp" />
     <ClInclude Include="EndsceneHandler.hpp" />
     <ClInclude Include="Log.hpp" />
     <ClInclude Include="Opcodes.h" />
     <ClInclude Include="Structs.h" />
-    <ClInclude Include="TDetour.hpp" />
+    <ClInclude Include="Detour.hpp" />
     <ClInclude Include="Timer.hpp" />
     <ClInclude Include="WindowsConsole.hpp" />
     <ClInclude Include="WowFuncs.hpp" />
