@@ -7,8 +7,6 @@
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //
 
-#include "TDetour.hpp"
-
 #if _MSC_VER >= 1900
 #pragma warning(push)
 #pragma warning(disable:4091) // empty typedef
