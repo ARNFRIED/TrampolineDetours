@@ -9,6 +9,9 @@ class Detour
 public:
 	Detour(int target_func, int hook): target{ (PVOID)target_func }, size{}
 	{		
+		DWORD old_protection;
+		VirtualProtect(target, sizeof(trampoline), PAGE_EXECUTE_READWRITE, &old_protection);
+
 		auto next_instr = target;
 
 		while (size < 6)
@@ -19,10 +22,7 @@ public:
 
 		trampoline[size] = 0x68;								// push ...
 		*(int*)&trampoline[size + 1] = (int)target + size;		// the address of the next valid instruction in the target
-		trampoline[size + 5] = 0xc3;							// return
-
-		DWORD old_protection;
-		VirtualProtect(target, size, PAGE_EXECUTE_READWRITE, &old_protection);
+		trampoline[size + 5] = 0xc3;							// return		
 
 		*(byte*)target = 0x68;									// push ...
 		*(int*)((int)target + 1) = hook;						// the address of the detour
@@ -32,7 +32,7 @@ public:
 			*(byte*)((int)target + i) = 0x90;					//fill the gap with NOPs
 		}
 
-		VirtualProtect(target, size, old_protection, 0);	
+		VirtualProtect(target, sizeof(trampoline), old_protection, 0);
 	}
 
 	~Detour()

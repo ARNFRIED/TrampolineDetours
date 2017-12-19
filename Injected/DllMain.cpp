@@ -6,7 +6,7 @@
 #include <string>
 #include <cstdio>
 
-#include "TDetour.hpp"
+#include "Detour.hpp"
 #include "WindowsConsole.hpp"
 #include "EndsceneHandler.hpp"
 #include "CommonDetours.hpp"
